@@ -32,15 +32,19 @@ enum custom_keycodes {
     MRO_5, // Paste
     MRO_6, // Password MHC
     MRO_BKSPC,
-    MRO_BKSPC_TOGGLE
+    MRO_BKSPC_TOGGLE,
+    MRO_ENC_U,
+    MRO_ENC_D,
+    MRO_ENC_CCW,
+    MRO_ENC_CW
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [MAC_BASE] = LAYOUT_ansi_92(
         MRO_3,  KC_ESC,             KC_BRID,  KC_BRIU,  KC_MCTL,  KC_LPAD,  RGB_VAD,  RGB_VAI,  KC_MPRV,  KC_MPLY,  KC_MNXT,  KC_MUTE,  KC_VOLD,    KC_VOLU,  KC_SNAP,  KC_SIRI,  RGB_MOD,
                   KC_GRV,   KC_1,     KC_2,     KC_3,     KC_4,     KC_5,     KC_6,     KC_7,     KC_8,     KC_9,     KC_0,     KC_MINS,  KC_EQL,     MRO_BKSPC,  KC_INS,   KC_HOME,  KC_PGUP,
-        MRO_4,  KC_TAB,   KC_Q,     KC_W,     KC_E,     KC_R,     KC_T,     KC_Y,     KC_U,     KC_I,     KC_O,     KC_P,     KC_LBRC,  KC_RBRC,    KC_BSLS,  KC_DEL,   KC_END,   KC_PGDN,
-        MRO_5,  KC_BSPC,  KC_A,     KC_S,     KC_D,     KC_F,     KC_G,     KC_H,     KC_J,     KC_K,     KC_L,     KC_SCLN,  KC_QUOT,              KC_ENT,
+        MRO_ENC_U,  KC_TAB,   KC_Q,     KC_W,     KC_E,     KC_R,     KC_T,     KC_Y,     KC_U,     KC_I,     KC_O,     KC_P,     KC_LBRC,  KC_RBRC,    KC_BSLS,  KC_DEL,   KC_END,   KC_PGDN,
+        MRO_ENC_D,  KC_BSPC,  KC_A,     KC_S,     KC_D,     KC_F,     KC_G,     KC_H,     KC_J,     KC_K,     KC_L,     KC_SCLN,  KC_QUOT,              KC_ENT,
         MRO_6,  KC_LSFT,            KC_Z,     KC_X,     KC_C,     KC_V,     KC_B,     KC_N,     KC_M,     KC_COMM,  KC_DOT,   KC_SLSH,              KC_RSFT,            KC_UP,
         MRO_BKSPC_TOGGLE,  KC_LCTL,  KC_LOPT,  KC_LCMD,                                KC_SPC,                                 KC_RCMD,  KC_ROPT,  MO(MAC_FN), KC_RCTL,  KC_LEFT,  KC_DOWN,  KC_RGHT),
 
@@ -71,11 +75,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 // extern uint8_t indicator_rgb;
 extern uint8_t indicator_backspace;
-// extern uint8_t indicator_encoder;
+extern uint8_t indicator_encoder;
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
-    [MAC_BASE] = { ENCODER_CCW_CW(MRO_1, MRO_2)},
+    [MAC_BASE] = { ENCODER_CCW_CW(MRO_ENC_CCW, MRO_ENC_CW)},
     [MAC_FN]   = { ENCODER_CCW_CW(KC_WH_U, KC_WH_D)},
     [WIN_BASE] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
     [WIN_FN]   = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
@@ -139,6 +143,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record){
         case MRO_6:
             if (record->event.pressed) {
                 SEND_STRING("tashad-5bivsy-Gabtix");
+                register_code(KC_ENT);
+            } else{
+                unregister_code(KC_ENT);
             }
         break;
 
@@ -167,6 +174,102 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record){
                 } else {
                     indicator_backspace = 0;
                 }
+            }
+        break;
+
+        case MRO_ENC_U:
+            if (record->event.pressed) {
+                if(indicator_encoder >= 3) {
+                    indicator_encoder = 3;
+                } else {
+                    indicator_encoder += 1;
+                }
+            }
+        break;
+
+        case MRO_ENC_D:
+            if (record->event.pressed) {
+                if(indicator_encoder <= 0) {
+                    indicator_encoder = 0;
+                } else {
+                    indicator_encoder -= 1;
+                }
+            }
+        break;
+
+        case MRO_ENC_CW:
+            switch(indicator_encoder){
+                case 0:
+                    if (record->event.pressed) {
+                        register_code(KC_LCTL);
+                        register_code(KC_RGHT);
+                    } else {
+                        unregister_code(KC_LCTL);
+                        unregister_code(KC_RGHT);
+                    }
+                break;
+
+                case 1:
+                    if (record->event.pressed) {
+                        register_code(KC_VOLU);
+                    } else {
+                        unregister_code(KC_VOLU);
+                    }
+                break;
+
+                case 2:
+                    if (record->event.pressed) {
+                        register_code(KC_RGHT);
+                    } else {
+                        unregister_code(KC_RGHT);
+                    }
+                break;
+
+                case 3:
+                    if (record->event.pressed) {
+                        register_code(KC_WH_D);
+                    } else {
+                        unregister_code(KC_WH_D);
+                    }
+                break;
+            }
+        break;
+
+        case MRO_ENC_CCW:
+            switch(indicator_encoder){
+                case 0:
+                    if (record->event.pressed) {
+                        register_code(KC_LCTL);
+                        register_code(KC_LEFT);
+                    } else {
+                        unregister_code(KC_LCTL);
+                        unregister_code(KC_LEFT);
+                    }
+                break;
+
+                case 1:
+                    if (record->event.pressed) {
+                        register_code(KC_VOLD);
+                    } else {
+                        unregister_code(KC_VOLD);
+                    }
+                break;
+
+                case 2:
+                    if (record->event.pressed) {
+                        register_code(KC_LEFT);
+                    } else {
+                        unregister_code(KC_LEFT);
+                    }
+                break;
+
+                case 3:
+                    if (record->event.pressed) {
+                        register_code(KC_WH_U);
+                    } else {
+                        unregister_code(KC_WH_U);
+                    }
+                break;
             }
         break;
     }

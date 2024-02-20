@@ -4,6 +4,7 @@ RGB_MATRIX_EFFECT(rgb_user)
 
 // uint8_t indicator_rgb = 0;
 uint8_t indicator_backspace = 0;
+uint8_t indicator_encoder = 0;
 
 // ZONES
 // 0: ESC
@@ -36,7 +37,7 @@ const uint16_t zone[12][14] = {
 
 uint8_t zone_rgb[12][3] = {
     {255,   100,   0},
-    {255,   0,     0},
+    {0,   0,     0},
     {255,   255,   255},
     {255,   240,   120},
     {0,     255,   255},
@@ -61,6 +62,7 @@ static bool rgb_user(effect_params_t *params){
     if(indicator_backspace == 1) {
         rgb_matrix_set_color(29, RGB_RED);
     }
+    rgb_matrix_set_color(indicator_encoder + 1, RGB_GREEN);
     return rgb_matrix_check_finished_leds(led_max);
 }
 #endif

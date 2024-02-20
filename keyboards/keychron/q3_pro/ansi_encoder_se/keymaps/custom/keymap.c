@@ -24,20 +24,31 @@ enum layers{
   WIN_FN,
 };
 
+enum custom_keycodes {
+    MRO_1 = QK_KB_15, // Move Space Left
+    MRO_2, // Move Space Right
+    MRO_3, // OS Command Bar
+    MRO_4, // Copy
+    MRO_5, // Paste
+    MRO_6, // Password MHC
+    MRO_BKSPC,
+    MRO_BKSPC_TOGGLE
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [MAC_BASE] = LAYOUT_ansi_92(
-        KC_MUTE,  KC_ESC,             KC_BRID,  KC_BRIU,  KC_MCTL,  KC_LPAD,  RGB_VAD,  RGB_VAI,  KC_MPRV,  KC_MPLY,  KC_MNXT,  KC_MUTE,  KC_VOLD,    KC_VOLU,  KC_SNAP,  KC_SIRI,  RGB_MOD,
-                  KC_GRV,   KC_1,     KC_2,     KC_3,     KC_4,     KC_5,     KC_6,     KC_7,     KC_8,     KC_9,     KC_0,     KC_MINS,  KC_EQL,     KC_BSPC,  KC_INS,   KC_HOME,  KC_PGUP,
-        _______,  KC_TAB,   KC_Q,     KC_W,     KC_E,     KC_R,     KC_T,     KC_Y,     KC_U,     KC_I,     KC_O,     KC_P,     KC_LBRC,  KC_RBRC,    KC_BSLS,  KC_DEL,   KC_END,   KC_PGDN,
-        _______,  KC_CAPS,  KC_A,     KC_S,     KC_D,     KC_F,     KC_G,     KC_H,     KC_J,     KC_K,     KC_L,     KC_SCLN,  KC_QUOT,              KC_ENT,
-        _______,  KC_LSFT,            KC_Z,     KC_X,     KC_C,     KC_V,     KC_B,     KC_N,     KC_M,     KC_COMM,  KC_DOT,   KC_SLSH,              KC_RSFT,            KC_UP,
-        _______,  KC_LCTL,  KC_LOPT,  KC_LCMD,                                KC_SPC,                                 KC_RCMD,  KC_ROPT,  MO(MAC_FN), KC_RCTL,  KC_LEFT,  KC_DOWN,  KC_RGHT),
+        MRO_3,  KC_ESC,             KC_BRID,  KC_BRIU,  KC_MCTL,  KC_LPAD,  RGB_VAD,  RGB_VAI,  KC_MPRV,  KC_MPLY,  KC_MNXT,  KC_MUTE,  KC_VOLD,    KC_VOLU,  KC_SNAP,  KC_SIRI,  RGB_MOD,
+                  KC_GRV,   KC_1,     KC_2,     KC_3,     KC_4,     KC_5,     KC_6,     KC_7,     KC_8,     KC_9,     KC_0,     KC_MINS,  KC_EQL,     MRO_BKSPC,  KC_INS,   KC_HOME,  KC_PGUP,
+        MRO_4,  KC_TAB,   KC_Q,     KC_W,     KC_E,     KC_R,     KC_T,     KC_Y,     KC_U,     KC_I,     KC_O,     KC_P,     KC_LBRC,  KC_RBRC,    KC_BSLS,  KC_DEL,   KC_END,   KC_PGDN,
+        MRO_5,  KC_BSPC,  KC_A,     KC_S,     KC_D,     KC_F,     KC_G,     KC_H,     KC_J,     KC_K,     KC_L,     KC_SCLN,  KC_QUOT,              KC_ENT,
+        MRO_6,  KC_LSFT,            KC_Z,     KC_X,     KC_C,     KC_V,     KC_B,     KC_N,     KC_M,     KC_COMM,  KC_DOT,   KC_SLSH,              KC_RSFT,            KC_UP,
+        MRO_BKSPC_TOGGLE,  KC_LCTL,  KC_LOPT,  KC_LCMD,                                KC_SPC,                                 KC_RCMD,  KC_ROPT,  MO(MAC_FN), KC_RCTL,  KC_LEFT,  KC_DOWN,  KC_RGHT),
 
     [MAC_FN] = LAYOUT_ansi_92(
         RGB_TOG,  _______,            KC_F1,    KC_F2,    KC_F3,    KC_F4,    KC_F5,    KC_F6,    KC_F7,    KC_F8,    KC_F9,    KC_F10,   KC_F11,     KC_F12,   _______,  _______,  RGB_TOG,
                   _______,  BT_HST1,  BT_HST2,  BT_HST3,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,  _______,  _______,  _______,
         _______,  RGB_TOG,  RGB_MOD,  RGB_VAI,  RGB_HUI,  RGB_SAI,  RGB_SPI,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,  _______,  _______,  _______,
-        _______,  _______,  RGB_RMOD, RGB_VAD,  RGB_HUD,  RGB_SAD,  RGB_SPD,  _______,  _______,  _______,  _______,  _______,  _______,              _______,
+        _______,  KC_CAPS,  RGB_RMOD, RGB_VAD,  RGB_HUD,  RGB_SAD,  RGB_SPD,  _______,  _______,  _______,  _______,  _______,  _______,              _______,
         _______,  _______,            _______,  _______,  _______,  _______,  BAT_LVL,  NK_TOGG,  _______,  _______,  _______,  _______,              _______,            _______,
         _______,  _______,  _______,  _______,                                _______,                                _______,  _______,  _______,    _______,  _______,  _______,  _______),
 
@@ -58,11 +69,115 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,  _______,  _______,  _______,                                _______,                                _______,  _______,  _______,    _______,  _______,  _______,  _______),
 };
 
+// extern uint8_t indicator_rgb;
+extern uint8_t indicator_backspace;
+// extern uint8_t indicator_encoder;
+
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
-    [MAC_BASE] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
-    [MAC_FN]   = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
+    [MAC_BASE] = { ENCODER_CCW_CW(MRO_1, MRO_2)},
+    [MAC_FN]   = { ENCODER_CCW_CW(KC_WH_U, KC_WH_D)},
     [WIN_BASE] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
     [WIN_FN]   = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
 };
 #endif // ENCODER_MAP_ENABLE
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record){
+    switch (keycode) {
+        case MRO_1:
+            if (record->event.pressed) {
+                register_code(KC_LCTL);
+                register_code(KC_LEFT);
+            } else {
+                unregister_code(KC_LCTL);
+                unregister_code(KC_LEFT);
+            }
+        break;
+
+        case MRO_2:
+            if (record->event.pressed) {
+                register_code(KC_LCTL);
+                register_code(KC_RGHT);
+            } else {
+                unregister_code(KC_LCTL);
+                unregister_code(KC_RGHT);
+            }
+        break;
+
+        case MRO_3:
+            if (record->event.pressed) {
+                register_code(KC_LCMD);
+                register_code(KC_SPC);
+            } else {
+                unregister_code(KC_SPC);
+                unregister_code(KC_LCMD);
+            }
+        break;
+
+        case MRO_4:
+            if (record->event.pressed) {
+                register_code(KC_LCMD);
+                register_code(KC_C);
+            } else {
+                unregister_code(KC_C);
+                unregister_code(KC_LCMD);
+            }
+        break;
+
+        case MRO_5:
+            if (record->event.pressed) {
+                register_code(KC_LCMD);
+                register_code(KC_LSFT);
+                register_code(KC_V);
+            } else {
+                unregister_code(KC_V);
+                unregister_code(KC_LSFT);
+                unregister_code(KC_LCMD);
+            }
+        break;
+
+        case MRO_6:
+            if (record->event.pressed) {
+                SEND_STRING("tashad-5bivsy-Gabtix");
+            }
+        break;
+
+        case MRO_BKSPC:
+            if (record->event.pressed) {
+                if(indicator_backspace == 0) {
+                    register_code(KC_BSPC);
+                } else {
+                    register_code(KC_RALT);
+                    register_code(KC_BSPC);
+                }
+            } else {
+                if(indicator_backspace == 0) {
+                    unregister_code(KC_BSPC);
+                } else {
+                    unregister_code(KC_BSPC);
+                    unregister_code(KC_RALT);
+                }
+            }
+        break;
+
+        case MRO_BKSPC_TOGGLE:
+            if (record->event.pressed) {
+                if(indicator_backspace == 0) {
+                    indicator_backspace = 1;
+                } else {
+                    indicator_backspace = 0;
+                }
+            }
+        break;
+    }
+
+    return true;
+}
+
+        // case MRO_:
+        //     if (record->event.pressed) {
+        //         register_code();
+        //     } else {
+        //         unregister_code();
+        //     }
+        // break;

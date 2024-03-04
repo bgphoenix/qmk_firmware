@@ -3,8 +3,9 @@ RGB_MATRIX_EFFECT(rgb_user)
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
 // uint8_t indicator_rgb = 0;
-uint8_t indicator_backspace = 0;
+uint8_t indicator_backspace = 1;
 uint8_t indicator_encoder = 0;
+uint8_t indicator_dynamic_macro = 0;
 
 // ZONES
 // 0: ESC
@@ -36,18 +37,18 @@ const uint16_t zone[12][14] = {
 };
 
 uint8_t zone_rgb[12][3] = {
-    {255,   100,   0},
-    {0,   0,     0},
-    {255,   255,   255},
-    {255,   240,   120},
-    {0,     255,   255},
-    {100,   0,     255},
-    {0,     255,     0}, //L
-    {0,     255,   255}, //R
-    {255,   255,   255}, //Pun
-    {255,   0,     255}, //Mod
+    {255,   128,     0}, //ESC
+    {0,     0,     0}, //FN1 Off
+    {255,   255,   255}, //FN2
+    {255,   255,   255}, //FN3
+    {0,     255,   255}, // Special Keys
+    {100,   100,   100}, //Num Row
+    {0,     255,   0}, //L
+    {140,   0,     255}, //R
+    {255,   128,    0}, //Pun
+    {0,     0,     255}, //Mod
     {0,     255,   0}, //Arr
-    {0,     255,   255}
+    {0,     255,   0}
 };
 
 static bool rgb_user(effect_params_t *params){
@@ -56,13 +57,27 @@ static bool rgb_user(effect_params_t *params){
 
     for (uint8_t i = 0; i < 12; i++) {
         for (uint8_t j = 0; j < 14; j++) {
-            rgb_matrix_set_color(zone[i][j], zone_rgb[i][0], zone_rgb[i][1], zone_rgb[i][2]);
+            if(zone[i][j] != 99) {
+                rgb_matrix_set_color(zone[i][j], zone_rgb[i][0], zone_rgb[i][1], zone_rgb[i][2]);
+            }
         }
     }
+
     if(indicator_backspace == 1) {
         rgb_matrix_set_color(29, RGB_RED);
     }
+
+    if(indicator_dynamic_macro == 1)  {
+        for(uint8_t i = 5; i < 13; i++){
+            rgb_matrix_set_color(i, RGB_RED);
+        }
+    }
+
+    if (host_keyboard_led_state().caps_lock){
+        rgb_matrix_set_color(52, RGB_RED);
+    }
     rgb_matrix_set_color(indicator_encoder + 1, RGB_GREEN);
+
     return rgb_matrix_check_finished_leds(led_max);
 }
 #endif

@@ -1,3 +1,25 @@
+# Custom Firmware for Q3 Pro
+
+This is my custom firmware for the Keychron Q3 Pro. The following has been added in apart from the stock QMK firmare:
+
+## QMK Features Enabled
+* CAPS Word
+* Dynamic Macros
+* Custom RGB Lighting
+* Combos
+* VIA
+
+## Additional Features
+* Custom Encoder Actions based on Selection on F1, F2, F3, F4 with selection indicator
+* Custom RGB Lighting for Shine Through Keycaps and Opaque Keycaps
+* Dynamic Macros on F11, F12. Use FN+F11 / FN+F12 to record Macros
+* Combos defiend on **M1** macro key
+* Custom Macros 
+* ALT+TAB Cycle
+* MacOS Specific Shortcuts on M3 key
+* Clipboard Manager on M4 Key
+
+
 # Quantum Mechanical Keyboard Firmware
 
 [![Current Version](https://img.shields.io/github/tag/qmk/qmk_firmware.svg)](https://github.com/qmk/qmk_firmware/tags)

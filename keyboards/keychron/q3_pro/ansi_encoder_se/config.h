@@ -52,3 +52,6 @@
 /* Specifed (0,1) which programmed as "ESC" key on this keyboard as bootmagic key */
 #define BOOTMAGIC_LITE_ROW 0
 #define BOOTMAGIC_LITE_COLUMN 1
+#define MOUSEKEY_INERTIA
+#define MOUSEKEY_DELAY 100
+#define MOUSEKEY_MOVE_DELTA 2

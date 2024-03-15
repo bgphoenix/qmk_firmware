@@ -3,7 +3,7 @@ RGB_MATRIX_EFFECT(rgb_user)
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
 // uint8_t indicator_rgb = 0;
-uint8_t indicator_backspace = 1;
+// uint8_t indicator_backspace = 1;
 uint8_t indicator_encoder = 0;
 uint8_t indicator_dynamic_macro = 0;
 
@@ -58,14 +58,24 @@ static bool rgb_user(effect_params_t *params){
     for (uint8_t i = 0; i < 12; i++) {
         for (uint8_t j = 0; j < 14; j++) {
             if(zone[i][j] != 99) {
-                rgb_matrix_set_color(zone[i][j], zone_rgb[i][0], zone_rgb[i][1], zone_rgb[i][2]);
+                // if(i == 6 || i == 7){
+                    rgb_matrix_set_color(zone[i][j], zone_rgb[i][0], zone_rgb[i][1], zone_rgb[i][2]);
+                // } else {
+                    // uint8_t wpm = get_current_wpm();
+                    // if (wpm >= 20) {
+                    //     rgb_matrix_set_color(zone[i][j], 0, 0 , 0);
+                    // } else {
+                    //     rgb_matrix_set_color(zone[i][j], zone_rgb[i][0], zone_rgb[i][1], zone_rgb[i][2]);
+                    // }
+
+                // }
             }
         }
     }
 
-    if(indicator_backspace == 1) {
-        rgb_matrix_set_color(29, RGB_RED);
-    }
+    // if(indicator_backspace == 1) {
+    //     rgb_matrix_set_color(29, RGB_RED);
+    // }
 
     if(indicator_dynamic_macro == 1)  {
         for(uint8_t i = 5; i < 13; i++){

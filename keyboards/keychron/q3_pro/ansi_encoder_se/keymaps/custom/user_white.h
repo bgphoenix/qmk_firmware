@@ -3,7 +3,7 @@ RGB_MATRIX_EFFECT(white_user)
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
 // uint8_t indicator_rgb = 0;
-extern uint8_t indicator_backspace;
+// extern uint8_t indicator_backspace;
 extern uint8_t indicator_encoder;
 extern uint8_t indicator_dynamic_macro;
 // uint8_t indicator_hsv_diff = 0;
@@ -81,23 +81,44 @@ uint8_t zone_hsv[12] = {
 
 static bool white_user(effect_params_t *params){
     RGB_MATRIX_USE_LIMITS(led_min, led_max);
-    HSV hsv_main = rgb_matrix_config.hsv;
-    HSV hsv = hsv_main;
+    HSV hsv = rgb_matrix_config.hsv;
+    uint16_t time = scale16by8(g_rgb_timer, rgb_matrix_config.speed / 8);
 
     for (uint8_t i = 0; i < 12; i++) {
         for (uint8_t j = 0; j < 14; j++) {
-            hsv.h = qadd8(hsv_main.h, zone_hsv[i]);
+
+            if(i <= 7){
+                hsv = rgb_matrix_config.hsv;
+                // hsv.v = scale8(abs8(sin8(time) - 128) * 2, hsv.v);
+                hsv.h = qadd8(hsv.h, zone_hsv[i]);
+                RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
+                rgb_matrix_set_color(zone[i][j], rgb.r, rgb.g, rgb.b);
+                // hsv_main.h = qadd8(hsv_main.h, zone_hsv[i]);
+                // RGB rgb = rgb_matrix_hsv_to_rgb(hsv_main);
+                // rgb_matrix_set_color(zone[i][j], rgb.r, rgb.g, rgb.b);
+            //     uint8_t wpm = get_current_wpm();
+            //     hsv.v = qsub8(255, scale8(wpm, 100));
+            } else {
+                hsv = rgb_matrix_config.hsv;
+                hsv.v = scale8(abs8(sin8(time) - 128) * 2, hsv.v);
+                if(hsv.v == 0 ) {
+                    rgb_matrix_increase_hue();
+                }
+                // hsv.h = scale8(abs8(sin8(time) - 128) * 2, hsv.h);
+                hsv.h = qadd8(hsv.h, zone_hsv[i]);
+                RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
+                rgb_matrix_set_color(zone[i][j], rgb.r, rgb.g, rgb.b);
+            }
             // hsv.h = hsv_changer(hsv_main.h, zone_hsv[i][0]);
             // hsv.s = hsv_changer(hsv_main.s, zone_hsv[i][1]);
             // hsv.v = hsv_changer(hsv_main.h, zone_hsv[i][2]);
-            RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
-            rgb_matrix_set_color(zone[i][j], rgb.r, rgb.g, rgb.b);
+
         }
     }
 
-    if(indicator_backspace == 1) {
-        rgb_matrix_set_color(29, RGB_RED);
-    }
+    // if(indicator_backspace == 1) {
+    //     rgb_matrix_set_color(29, RGB_RED);
+    // }
 
     if(indicator_dynamic_macro == 1)  {
         for(uint8_t i = 5; i < 13; i++){
@@ -108,7 +129,7 @@ static bool white_user(effect_params_t *params){
     if (host_keyboard_led_state().caps_lock){
         rgb_matrix_set_color(52, RGB_RED);
     }
-    rgb_matrix_set_color(indicator_encoder + 1, RGB_BLUE);
+    rgb_matrix_set_color(indicator_encoder + 1, RGB_RED);
 
     return rgb_matrix_check_finished_leds(led_max);
 }

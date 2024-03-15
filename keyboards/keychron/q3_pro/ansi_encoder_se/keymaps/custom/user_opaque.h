@@ -3,7 +3,7 @@ RGB_MATRIX_EFFECT(opaque_user)
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
 // uint8_t indicator_rgb = 0;
-extern uint8_t indicator_backspace;
+// extern uint8_t indicator_backspace;
 extern uint8_t indicator_encoder;
 extern uint8_t indicator_dynamic_macro;
 
@@ -67,9 +67,9 @@ static bool opaque_user(effect_params_t *params){
         }
     }
 
-    if(indicator_backspace == 1) {
-        rgb_matrix_set_color(29, RGB_RED);
-    }
+    // if(indicator_backspace == 1) {
+    //     rgb_matrix_set_color(29, RGB_RED);
+    // }
 
     if(indicator_dynamic_macro == 1)  {
         for(uint8_t i = 5; i < 13; i++){

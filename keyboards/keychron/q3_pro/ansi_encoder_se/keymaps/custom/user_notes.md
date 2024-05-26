@@ -68,3 +68,11 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 |MRO_ENC_CW| Encoder: CW Function| CW macro based on the selected function code|
 
 
+## NEW TODO
+
+- [ ] Leader Keys
+- [ ] Dynamic Encoder
+- [ ] Caps Word
+- [ ] Backspace
+
+

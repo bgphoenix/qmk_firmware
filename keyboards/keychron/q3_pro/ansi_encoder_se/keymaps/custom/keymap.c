@@ -16,11 +16,9 @@
 
 #include QMK_KEYBOARD_H
 
-bool is_alt_tab_active = false; // ADD this near the beginning of keymap.c
-uint16_t alt_tab_timer = 0;     // we will be using them soon.
+bool is_alt_tab_active = false;
+uint16_t alt_tab_timer = 0;
 
-bool is_alt_shift_tab_active = false; // ADD this near the beginning of keymap.c
-uint16_t alt_shift_tab_timer = 0;     // we will be using them soon.
 
 // clang-format off
 enum layers{
@@ -31,110 +29,96 @@ enum layers{
   WIN_FN,
 };
 
-// enum combo_events {
-//     PW_MAC,
-//     PW_MHC,
-//     TX_EMAIL,
-//     TX_ADDR,
-//     COMBO_LENGTH
-// };
-
-// uint16_t COMBO_LEN = COMBO_LENGTH; // remove the COMBO_COUNT define and use this instead!
+typedef struct {
+    uint16_t tap;
+    uint16_t hold;
+    uint16_t held;
+} tap_dance_tap_hold_t;
 
 enum custom_keycodes {
-    MRO_1 = QK_KB_15,
-    MRO_2,
-    MRO_SL,
-    MRO_COPY,
-    MRO_PASTE, // Paste
-    MRO_BKSPC,
-    // MRO_BKSPC_TOGGLE,
-    ENC_1,
-    ENC_2,
-    ENC_3,
-    ENC_4,
-    MPW_1,
-    MPW_2,
-    MPW_3,
-    MTS,
-    MEMAIL,
-    MNAME,
-    MPHONE,
-    // MRO_ENC_HSV_U,
-    // MRO_ENC_HSV_D,
-    MRO_ENC_CCW,
-    MRO_ENC_CW,
-    MRO_ALTTAB,
-    MRO_ALSHTB
+    M_SLCT = QK_KB_15,
+    M_SRCH,
+    M_COPY,
+    M_PSTE,
+    M_BSPC,
+    M_ALTB,
+    E_M001,
+    E_M002,
+    E_M003,
+    E_M004,
+    EM_CCW,
+    EM_CW,
+    P_OSPW,
+    P_SMHC,
+    P_SGML,
+    T_TSMP,
+    T_MAIL,
+    T_NAME,
+    T_PHON,
+    T_NOTE
+};
+
+enum {
+    TD_CAPS,
+    TD_INFO,
+    TD_PMHC,
+    TD_CLBD,
+    TD_ENCD,
+    TD_RALT,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [MAC_BASE] = LAYOUT_ansi_92(
-        MO(WIN_FN),     KC_ESC,                 ENC_1,    ENC_2,    ENC_3,          ENC_4,  KC_MCTL,  KC_LPAD,  KC_MPRV,  KC_MPLY,  KC_MNXT,  KC_MUTE,  DM_PLY1,    DM_PLY2,  KC_WH_D,  QK_LOCK,  RGB_MOD,
-                        KC_GRV,     KC_1,       KC_2,     KC_3,     KC_4,           KC_5,     KC_6,     KC_7,     KC_8,     KC_9,     KC_0,     KC_MINS,  KC_EQL,     KC_BSPC,  KC_BTN1,   KC_MS_U,  KC_BTN2,
-        MO(MAC_FN2),   KC_TAB,     KC_Q,       KC_W,     KC_E,     KC_R,           KC_T,     KC_Y,     KC_U,     KC_I,     KC_O,     KC_P,     KC_LBRC,  KC_RBRC,    KC_BSLS,  KC_MS_L,   KC_MS_D,   KC_MS_R,
-        CW_TOGG,        MRO_BKSPC,  KC_A,       KC_S,     KC_D,     KC_F,           KC_G,     KC_H,     KC_J,     KC_K,     KC_L,     KC_SCLN,  KC_QUOT,              KC_ENT,
-        MRO_SL,         KC_LSFT,    KC_Z,       KC_X,     KC_C,     KC_V,           KC_B,     KC_N,     KC_M,     KC_COMM,  KC_DOT,   KC_SLSH,              KC_RSFT,            KC_UP,
-        MRO_ALTTAB,      KC_LCTL,    KC_LOPT,    KC_LCMD,                                KC_SPC,                                 KC_RCMD,  MO(WIN_FN),  MO(MAC_FN), KC_RCTL,  KC_LEFT,  KC_DOWN,  KC_RGHT),
+        MO(WIN_FN),         KC_ESC,                  E_M001,            E_M002,    E_M003,  E_M004,     KC_MCTL,  KC_LPAD,  KC_MPRV,  KC_MPLY,          KC_MNXT,            KC_MUTE,  DM_PLY1,    DM_PLY2,        TD(TD_INFO),  TD(TD_ENCD),  RGB_MOD,
+                            KC_GRV,      KC_1,       KC_2,              KC_3,      KC_4,    KC_5,       KC_6,     KC_7,     KC_8,     KC_9,             KC_0,               KC_MINS,  KC_EQL,     KC_BSPC,        KC_BTN1,      KC_MS_U,      KC_BTN2,
+        OSL(MAC_FN2),       KC_TAB,      KC_Q,       KC_W,              KC_E,      KC_R,    KC_T,       KC_Y,     KC_U,     KC_I,     KC_O,             KC_P,               KC_LBRC,  KC_RBRC,    KC_BSLS,        KC_MS_L,      KC_MS_D,      KC_MS_R,
+        TD(TD_PMHC),        M_BSPC,      KC_A,       KC_S,              KC_D,      KC_F,    KC_G,       KC_H,     KC_J,     KC_K,     KC_L,             KC_SCLN,            KC_QUOT,              KC_ENT,
+        TD(TD_CLBD),        KC_LSFT,     KC_Z,       KC_X,              KC_C,      KC_V,    KC_B,       KC_N,     KC_M,     KC_COMM,  KC_DOT,           KC_SLSH,                                  KC_RSFT,                      KC_UP,
+        M_ALTB,             KC_LCTL,     KC_LOPT,    LCMD_T(KC_DOT),                        KC_SPC,                                   RCMD_T(KC_BSPC),  ROPT_T(KC_EXLM),    MO(MAC_FN),           KC_RCTL,        KC_LEFT,      KC_DOWN,      KC_RGHT),
 
-    [MAC_FN] = LAYOUT_ansi_92(
-        RGB_TOG,        DM_RSTP,                KC_F1,    KC_F2,    KC_F3,          KC_F4,    KC_F5,    KC_F6,    KC_F7,    KC_F8,    KC_F9,    KC_F10,   DM_REC1,    DM_REC2,   _______,  _______,  RGB_TOG,
-                        _______,    BT_HST1,    BT_HST2,  BT_HST3,  _______,        _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,  _______,  _______,  _______,
-        MRO_1,          CW_TOGG,    RGB_MOD,    RGB_VAI,  RGB_HUI,  RGB_SAI,        RGB_SPI,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,  QK_BOOT,  _______,  _______,
-        MRO_COPY,     KC_CAPS,    RGB_RMOD,   RGB_VAD,  RGB_HUD,  RGB_SAD,        RGB_SPD,  _______,  _______,  _______,  _______,  _______,  _______,              _______,
-        MRO_SL,         _______,                _______,  _______,  _______,        _______,  BAT_LVL,  NK_TOGG,  _______,  _______,  _______,  _______,              _______,            _______,
-        MRO_PASTE,       _______,    _______,    _______,                                _______,                                _______,  _______,  _______,    _______,  _______,  _______,  _______),
+     [MAC_FN] = LAYOUT_ansi_92(
+        RGB_TOG,            QK_BOOT,                 KC_F1,             KC_F2,     KC_F3,   KC_F4,      KC_F5,    KC_F6,    KC_F7,    KC_F8,            KC_F9,              KC_F10,   DM_REC1,    DM_REC2,        _______,      _______,      RGB_TOG,
+                            _______,     BT_HST1,    BT_HST2,           BT_HST3,   _______, _______,    _______,  _______,  _______,  _______,          _______,            _______,  _______,    _______,        _______,      _______,      _______,
+        M_SLCT,             CW_TOGG,     RGB_MOD,    RGB_VAI,           RGB_HUI,   RGB_SAI, RGB_SPI,    _______,  _______,  _______,  _______,          _______,            _______,  _______,    _______,        KC_DEL,       _______,      _______,
+        M_COPY,             KC_CAPS,     RGB_RMOD,   RGB_VAD,           RGB_HUD,   RGB_SAD, RGB_SPD,    _______,  _______,  _______,  _______,          _______,            _______,              _______,
+        M_SRCH,             _______,     _______,    _______,           _______,   _______, BAT_LVL,    NK_TOGG,  _______,  _______,  _______,          _______,                                  _______,                      _______,
+        M_PSTE,             _______,     _______,    _______,                               _______,                                  _______,          _______,            _______,              _______,        _______,      _______,      _______),
 
-    [MAC_FN2] = LAYOUT_ansi_92(
-        RGB_TOG,        _______,                KC_F1,      KC_F2,     KC_F3,        KC_F4,    KC_F5,    KC_F6,    KC_F7,    KC_F8,    KC_F9,    KC_F10,   DM_REC1,    DM_REC2,   _______,  _______,  RGB_TOG,
-                        _______,    MPW_1,      MPW_2,      MPW_3,     _______,      _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,  _______,  _______,  _______,
-        _______,        KC_MCTL,    _______,    _______,    MEMAIL,    _______,       MTS,      _______,  _______,  _______,  _______,  MPHONE,  _______,  _______,    _______,  QK_BOOT,  _______,  _______,
-        _______,        KC_CAPS,    _______,    _______,    _______,   _______,      _______,  _______,  _______,  _______,  _______,  _______,  _______,              _______,
-        _______,        _______,    MNAME,      _______,    MRO_COPY,  MRO_PASTE,      _______,  _______,  _______,  _______,  _______,  _______,              _______,            _______,
-        VK_TOGG,        _______,    _______,    _______,                                MRO_SL,                                _______,  _______,  _______,    _______,  _______,  _______,  _______),
+     [MAC_FN2] = LAYOUT_ansi_92(
+        RGB_TOG,            QK_BOOT,                 KC_F1,             KC_F2,     KC_F3,   KC_F4,      KC_F5,    KC_F6,    KC_F7,    KC_F8,            KC_F9,              KC_F10,   DM_REC1,    DM_REC2,        _______,      _______,      RGB_TOG,
+                            _______,     P_OSPW,     P_SMHC,            P_SGML,    _______, _______,    _______,  _______,  _______,  _______,          _______,            _______,  _______,    _______,        _______,      _______,      _______,
+        M_SLCT,             KC_MCTL,     _______,    _______,           T_MAIL,    _______, T_TSMP,     _______,  _______,  _______,  _______,          _______,            _______,  _______,    _______,        QK_BOOT,      _______,      _______,
+        M_COPY,             KC_CAPS,     _______,    _______,           _______,   _______, _______,    _______,  _______,  _______,  _______,          _______,            _______,              _______,
+        M_SRCH,             _______,     T_NAME,     _______,           M_COPY,    M_PSTE,  BAT_LVL,    _______,  _______,  _______,  _______,          _______,                                  _______,                      _______,
+        VK_TOGG,            DM_PLY1,     _______,    DM_PLY2,                               T_NOTE,                                   DM_REC2,          _______,            _______,              DM_REC1,        _______,      _______,      _______),
 
 
     [WIN_BASE] = LAYOUT_ansi_92(
-        KC_MUTE,  KC_ESC,             KC_F1,    KC_F2,    KC_F3,    KC_F4,    KC_F5,    KC_F6,    KC_F7,    KC_F8,    KC_F9,    KC_F10,   KC_F11,     KC_F12,   KC_PSCR,  KC_CTANA, RGB_MOD,
-                  KC_GRV,   KC_1,     KC_2,     KC_3,     KC_4,     KC_5,     KC_6,     KC_7,     KC_8,     KC_9,     KC_0,     KC_MINS,  KC_EQL,     KC_BSPC,  KC_INS,   KC_HOME,  KC_PGUP,
-        _______,  KC_TAB,   KC_Q,     KC_W,     KC_E,     KC_R,     KC_T,     KC_Y,     KC_U,     KC_I,     KC_O,     KC_P,     KC_LBRC,  KC_RBRC,    KC_BSLS,  KC_DEL,   KC_END,   KC_PGDN,
-        _______,  KC_CAPS,  KC_A,     KC_S,     KC_D,     KC_F,     KC_G,     KC_H,     KC_J,     KC_K,     KC_L,     KC_SCLN,  KC_QUOT,              KC_ENT,
-        _______,  KC_LSFT,            KC_Z,     KC_X,     KC_C,     KC_V,     KC_B,     KC_N,     KC_M,     KC_COMM,  KC_DOT,   KC_SLSH,              KC_RSFT,            KC_UP,
-        _______,  KC_LCTL,  KC_LWIN,  KC_LALT,                                KC_SPC,                                 KC_RALT,  KC_RWIN,  MO(WIN_FN), KC_RCTL,  KC_LEFT,  KC_DOWN,  KC_RGHT),
+        KC_MUTE,            KC_ESC,             KC_F1,    KC_F2,    KC_F3,    KC_F4,    KC_F5,    KC_F6,    KC_F7,    KC_F8,    KC_F9,    KC_F10,   KC_F11,     KC_F12,   KC_PSCR,  KC_CTANA, RGB_MOD,
+                            KC_GRV,   KC_1,     KC_2,     KC_3,     KC_4,     KC_5,     KC_6,     KC_7,     KC_8,     KC_9,     KC_0,     KC_MINS,  KC_EQL,     KC_BSPC,  KC_INS,   KC_HOME,  KC_PGUP,
+        _______,            KC_TAB,   KC_Q,     KC_W,     KC_E,     KC_R,     KC_T,     KC_Y,     KC_U,     KC_I,     KC_O,     KC_P,     KC_LBRC,  KC_RBRC,    KC_BSLS,  KC_DEL,   KC_END,   KC_PGDN,
+        _______,            KC_CAPS,  KC_A,     KC_S,     KC_D,     KC_F,     KC_G,     KC_H,     KC_J,     KC_K,     KC_L,     KC_SCLN,  KC_QUOT,              KC_ENT,
+        _______,            KC_LSFT,            KC_Z,     KC_X,     KC_C,     KC_V,     KC_B,     KC_N,     KC_M,     KC_COMM,  KC_DOT,   KC_SLSH,              KC_RSFT,            KC_UP,
+        _______,            KC_LCTL,  KC_LWIN,  KC_LALT,                                KC_SPC,                                 KC_RALT,  KC_RWIN,  MO(WIN_FN), KC_RCTL,  KC_LEFT,  KC_DOWN,  KC_RGHT),
 
     [WIN_FN] = LAYOUT_ansi_92(
-        RGB_TOG,  _______,            KC_BRID,  KC_BRIU,  KC_TASK,  KC_FILE,  RGB_VAD,  RGB_VAI,  KC_MPRV,  KC_MPLY,  KC_MNXT,  KC_MUTE,  KC_VOLD,  KC_VOLU,    _______,  _______,  RGB_TOG,
-                  _______,  BT_HST1,  BT_HST2,  BT_HST3,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,  _______,  _______,  _______,
-        KC_BTN1,  RGB_TOG,  RGB_MOD,  RGB_VAI,  RGB_HUI,  RGB_SAI,  RGB_SPI,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,  _______,  _______,  _______,
-        KC_BTN2,  _______,  RGB_RMOD, RGB_VAD,  RGB_HUD,  RGB_SAD,  RGB_SPD,  _______,  _______,  _______,  _______,  _______,  _______,              _______,
-        _______,  _______,            _______,  _______,  _______,  _______,  BAT_LVL,  NK_TOGG,  _______,  _______,  _______,  _______,              _______,            KC_MS_U,
-        _______,  KC_ACL0,  KC_ACL1,  KC_ACL2,                                _______,                                _______,  _______,  _______,    _______,  KC_MS_L,  KC_MS_D,  KC_MS_R),
+        RGB_TOG,            _______,            KC_BRID,  KC_BRIU,  KC_TASK,  KC_FILE,  RGB_VAD,  RGB_VAI,  KC_MPRV,  KC_MPLY,  KC_MNXT,  KC_MUTE,  KC_VOLD,  KC_VOLU,    _______,  _______,  RGB_TOG,
+                            _______,  BT_HST1,  BT_HST2,  BT_HST3,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,  _______,  _______,  _______,
+        KC_BTN1,            RGB_TOG,  RGB_MOD,  RGB_VAI,  RGB_HUI,  RGB_SAI,  RGB_SPI,  _______,  _______,  _______,  _______,  _______,  _______,  _______,    _______,  _______,  _______,  _______,
+        KC_BTN2,            _______,  RGB_RMOD, RGB_VAD,  RGB_HUD,  RGB_SAD,  RGB_SPD,  _______,  _______,  _______,  _______,  _______,  _______,              _______,
+        _______,            _______,            _______,  _______,  _______,  _______,  BAT_LVL,  NK_TOGG,  _______,  _______,  _______,  _______,              _______,            KC_MS_U,
+        _______,            KC_ACL0,  KC_ACL1,  KC_ACL2,                                _______,                                _______,  _______,  _______,    _______,  KC_MS_L,  KC_MS_D,  KC_MS_R),
 };
 
-// extern uint8_t indicator_rgb;
-// extern uint8_t indicator_backspace;
+
 extern uint8_t indicator_encoder;
 extern uint8_t indicator_dynamic_macro;
-// extern uint8_t indicator_hsv_diff;
-
-// const uint16_t PROGMEM combo_pass_mac[] = {MRO_1, KC_M, COMBO_END};
-// const uint16_t PROGMEM combo_pass_mhc[] = {MRO_1, KC_P, COMBO_END};
-// const uint16_t PROGMEM combo_email[] = {MRO_1, KC_E, COMBO_END};
-// const uint16_t PROGMEM combo_address[] = {MRO_1, KC_A, COMBO_END};
-
-// combo_t key_combos[] = {
-//   [PW_MAC] = COMBO_ACTION(combo_pass_mac),
-//   [PW_MHC] = COMBO_ACTION(combo_pass_mhc),
-//   [TX_EMAIL] = COMBO_ACTION(combo_email),
-//   [TX_ADDR] = COMBO_ACTION(combo_address)
-// };
-
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
-    [MAC_BASE] = { ENCODER_CCW_CW(MRO_ENC_CCW, MRO_ENC_CW)},
+    [MAC_BASE] = { ENCODER_CCW_CW(EM_CCW, EM_CW)},
     [MAC_FN]   = { ENCODER_CCW_CW(RGB_HUD, RGB_HUI)},
-    [MAC_FN2]   = { ENCODER_CCW_CW(MRO_ALSHTB, MRO_ALTTAB)},
+    [MAC_FN2]   = { ENCODER_CCW_CW(KC_MCTL, M_ALTB)},
     [WIN_BASE] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
     [WIN_FN]   = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
 };
@@ -144,223 +128,107 @@ void keyboard_post_init_user(void) {
     rgb_matrix_mode_noeeprom(RGB_MATRIX_CUSTOM_white_user);
 }
 
-void matrix_scan_user(void) { // The very important timer.
+void matrix_scan_user(void){
     if (is_alt_tab_active) {
         if (timer_elapsed(alt_tab_timer) > 1000) {
             unregister_code(KC_LGUI);
             is_alt_tab_active = false;
         }
     }
-
-    if (is_alt_shift_tab_active) {
-        if (timer_elapsed(alt_shift_tab_timer) > 1000) {
-            unregister_code(KC_LGUI);
-            unregister_code(KC_LSFT);
-            is_alt_shift_tab_active = false;
-        }
-    }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record){
+    tap_dance_action_t *action;
+
     switch (keycode) {
-        case MRO_1:
+        case M_SLCT:
             if (record->event.pressed) {
-                register_code(KC_LCMD);
-                register_code(KC_LEFT);
-                unregister_code(KC_LCMD);
-                unregister_code(KC_LEFT);
-
-                register_code(KC_LCMD);
-
-                register_code(KC_LSFT);
-                register_code(KC_RGHT);
-                unregister_code(KC_LSFT);
-                unregister_code(KC_RGHT);
-
-                register_code(KC_C);
-            } else {
-                unregister_code(KC_LCMD);
-                unregister_code(KC_C);
+                SEND_STRING(SS_LCMD(SS_TAP(X_LEFT)) SS_LCMD(SS_LSFT(SS_TAP(X_RIGHT))) SS_LCMD(SS_TAP(X_C)));
             }
-        break;
+            break;
 
-        case MRO_2:
-            // if (record->event.pressed) {
-            //     register_code(KC_LCTL);
-            //     register_code(KC_RGHT);
-            // } else {
-            //     unregister_code(KC_LCTL);
-            //     unregister_code(KC_RGHT);
-            // }
-        break;
-
-        case MRO_SL:
+        case M_SRCH:
             if (record->event.pressed) {
-                register_code(KC_LCMD);
-                register_code(KC_SPC);
-            } else {
-                unregister_code(KC_SPC);
-                unregister_code(KC_LCMD);
+                SEND_STRING(SS_LCMD(SS_TAP(X_SPACE)));
             }
-        break;
+            break;
 
-        case MRO_COPY:
+        case M_COPY:
             if (record->event.pressed) {
-                register_code(KC_LCMD);
-                register_code(KC_C);
-            } else {
-                unregister_code(KC_C);
-                unregister_code(KC_LCMD);
+                SEND_STRING(SS_LCMD(SS_TAP(X_C)));
             }
-        break;
+            break;
 
-        case MRO_PASTE:
+        case M_PSTE:
             if (record->event.pressed) {
-                register_code(KC_LCMD);
-                register_code(KC_LSFT);
-                register_code(KC_V);
-            } else {
-                unregister_code(KC_V);
-                unregister_code(KC_LSFT);
-                unregister_code(KC_LCMD);
+                SEND_STRING(SS_LCMD(SS_LSFT(SS_TAP(X_V))));
             }
-        break;
+            break;
 
-        case MRO_BKSPC:
+        case M_BSPC:
             if (record->event.pressed) {
-            //     if(indicator_backspace == 0) {
-            //         register_code(KC_BSPC);
-            //     } else {
-                    register_code(KC_RALT);
-                    register_code(KC_BSPC);
-                // }
-            } else {
-                // if(indicator_backspace == 0) {
-                    // unregister_code(KC_BSPC);
-                // } else {
-                    unregister_code(KC_BSPC);
-                    unregister_code(KC_RALT);
-                // }
+                SEND_STRING(SS_LOPT(SS_TAP(X_BSPC)));
             }
-        break;
+            break;
 
-        // case MRO_BKSPC_TOGGLE:
-        //     if (record->event.pressed) {
-        //         if(indicator_backspace == 0) {
-        //             indicator_backspace = 1;
-        //         } else {
-        //             indicator_backspace = 0;
-        //         }
-        //     }
-        // break;
+        case E_M001:
+            if(record->event.pressed){ indicator_encoder = 0; }
+            break;
 
-        case ENC_1:
-            if (record->event.pressed) {
-                indicator_encoder = 0;
-            }
-        break;
+        case E_M002:
+            if(record->event.pressed){ indicator_encoder = 1; }
+            break;
 
-        case ENC_2:
-            if (record->event.pressed) {
-                indicator_encoder = 1;
-            }
-        break;
+        case E_M003:
+            if(record->event.pressed){ indicator_encoder = 2; }
+            break;
 
-        case ENC_3:
-            if (record->event.pressed) {
-                indicator_encoder = 2;
-            }
-        break;
+        case E_M004:
+            if(record->event.pressed){ indicator_encoder = 3; }
+            break;
 
-        case ENC_4:
-            if (record->event.pressed) {
-                indicator_encoder = 3;
-            }
-        break;
-
-        case MRO_ENC_CW:
+        case EM_CW:
             switch(indicator_encoder){
                 case 0:
-                    if (record->event.pressed) {
-                        register_code(KC_LCTL);
-                        register_code(KC_RGHT);
-                    } else {
-                        unregister_code(KC_LCTL);
-                        unregister_code(KC_RGHT);
-                    }
+                    if (record->event.pressed) { SEND_STRING(SS_LCTL(SS_TAP(X_RIGHT))); }
                 break;
 
                 case 1:
-                    if (record->event.pressed) {
-                        register_code(KC_VOLU);
-                    } else {
-                        unregister_code(KC_VOLU);
-                    }
+                    if (record->event.pressed) { SEND_STRING(SS_LALT(SS_TAP(X_RIGHT))); }
                 break;
 
                 case 2:
-                    if (record->event.pressed) {
-                        register_code(KC_RGHT);
-                    } else {
-                        unregister_code(KC_RGHT);
-                    }
+                    if (record->event.pressed) { SEND_STRING(SS_TAP(X_RIGHT)); }
                 break;
 
                 case 3:
-                    if (record->event.pressed) {
-                        register_code(KC_WH_D);
-                    } else {
-                        unregister_code(KC_WH_D);
-                    }
+                    if (record->event.pressed) { SEND_STRING(SS_TAP(X_WH_D)); }
                 break;
             }
-        break;
+            break;
 
-        case MRO_ENC_CCW:
+        case EM_CCW:
             switch(indicator_encoder){
                 case 0:
-                    if (record->event.pressed) {
-                        register_code(KC_LCTL);
-                        register_code(KC_LEFT);
-                    } else {
-                        unregister_code(KC_LCTL);
-                        unregister_code(KC_LEFT);
-                    }
+                    if (record->event.pressed) { SEND_STRING(SS_LCTL(SS_TAP(X_LEFT))); }
                 break;
 
                 case 1:
-                    if (record->event.pressed) {
-                        register_code(KC_VOLD);
-                    } else {
-                        unregister_code(KC_VOLD);
-                    }
+                    if (record->event.pressed) { SEND_STRING(SS_LALT(SS_TAP(X_LEFT))); }
                 break;
 
                 case 2:
-                    if (record->event.pressed) {
-                        register_code(KC_LEFT);
-                    } else {
-                        unregister_code(KC_LEFT);
-                    }
+                    if (record->event.pressed) { SEND_STRING(SS_TAP(X_LEFT)); }
                 break;
 
                 case 3:
-                    if (record->event.pressed) {
-                        register_code(KC_WH_U);
-                    } else {
-                        unregister_code(KC_WH_U);
-                    }
+                    if (record->event.pressed) { SEND_STRING(SS_TAP(X_WH_U)); }
                 break;
             }
-        break;
+            break;
 
-        case MRO_ALTTAB:
+        case M_ALTB:
             if (record->event.pressed) {
-                if (is_alt_shift_tab_active) {
-                        unregister_code(KC_LGUI);
-                        unregister_code(KC_LSFT);
-                        is_alt_shift_tab_active = false;
-                }
                 if (!is_alt_tab_active) {
                     is_alt_tab_active = true;
                     register_code(KC_LGUI);
@@ -370,123 +238,152 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record){
             } else {
                 unregister_code(KC_TAB);
             }
-        break;
+            break;
 
-        case MRO_ALSHTB:
-            if (record->event.pressed) {
-                if (is_alt_tab_active) {
-                        unregister_code(KC_LGUI);
-                        is_alt_tab_active = false;
-                }
-                if (!is_alt_shift_tab_active) {
-                    is_alt_shift_tab_active = true;
-                    register_code(KC_LGUI);
-                    register_code(KC_LSFT);
-                }
-                alt_shift_tab_timer = timer_read();
-                register_code(KC_TAB);
-            } else {
-                unregister_code(KC_TAB);
+        case P_OSPW:
+            if (record->event.pressed) { SEND_STRING("zee$han\n"); }
+            break;
+
+        case P_SMHC:
+            if (record->event.pressed) { SEND_STRING("Zee$han11\n"); }
+            break;
+
+        case P_SGML:
+            if (record->event.pressed) { SEND_STRING("fohjog-nidquf-3sAxre\n"); }
+            break;
+
+        case T_TSMP:
+            if (record->event.pressed) { SEND_STRING("!ts "); }
+            break;
+
+        case T_MAIL:
+            if (record->event.pressed) { SEND_STRING("zeeshan.mujawar@live.com"); }
+            break;
+
+        case T_NAME:
+            if (record->event.pressed) { SEND_STRING("Dr Zeeshan Mujawar"); }
+            break;
+
+        case T_PHON:
+            if (record->event.pressed) { SEND_STRING("9625951107"); }
+            break;
+
+        case T_NOTE:
+            if (record->event.pressed) { SEND_STRING("!zm " SS_DELAY(175) SS_TAP(X_DOWN) " Room" SS_TAP(X_TAB) "!note " SS_DELAY(175) SS_TAP(X_TAB) "!mse "); }
+            break;
+
+        case TD(TD_CAPS):  // list all tap dance keycodes with tap-hold configurations
+            action = &tap_dance_actions[TD_INDEX(keycode)];
+            if (!record->event.pressed && action->state.count && !action->state.finished) {
+                tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
+                tap_code16(tap_hold->tap);
             }
-        break;
+            break;
 
-        case MPW_1:
-            if (record->event.pressed) {
-                SEND_STRING("zee$han\n");
-                // register_code(KC_ENT);
-            } else {
-                // unregister_code(KC_ENT);
+        case TD(TD_RALT):  // list all tap dance keycodes with tap-hold configurations
+            action = &tap_dance_actions[TD_INDEX(keycode)];
+            if (!record->event.pressed && action->state.count && !action->state.finished) {
+                tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
+                tap_code16(tap_hold->tap);
             }
-        break;
-
-        case MPW_2:
-            if (record->event.pressed) {
-                SEND_STRING("Zee$han11\n");
-                // register_code(KC_ENT);
-            } else {
-                // unregister_code(KC_ENT);
-            }
-        break;
-
-        case MPW_3:
-            if (record->event.pressed) {
-                SEND_STRING("fohjog-nidquf-3sAxre\n");
-            }
-        break;
-
-        case MTS:
-            if (record->event.pressed) {
-                SEND_STRING("!ts ");
-            }
-        break;
-
-        case MEMAIL:
-            if (record->event.pressed) {
-                SEND_STRING("zeeshan.mujawar@live.com");
-            }
-        break;
-
-        case MNAME:
-            if (record->event.pressed) {
-                SEND_STRING("Dr Zeeshan Mujawar");
-            }
-        break;
-
-        case MPHONE:
-            if (record->event.pressed) {
-                SEND_STRING("9625951107");
-            }
-        break;
-
-
+            break;
     }
 
     return true;
 }
 
-// void process_combo_event(uint16_t combo_index, bool pressed) {
-//   switch(combo_index) {
-//     case PW_MAC:
-//       if (pressed) {
-//         SEND_STRING("zee$han");
-//       }
-//     break;
+void tap_dance_tap_hold_finished(tap_dance_state_t *state, void *user_data) {
+    tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
 
-//     case PW_MHC:
-//       if (pressed) {
-//         SEND_STRING("tashad-5bivsy-Gabtix");
-//       }
-//     break;
+    if (state->pressed) {
+        if (state->count == 1
+#ifndef PERMISSIVE_HOLD
+            && !state->interrupted
+#endif
+        ) {
+            register_code16(tap_hold->hold);
+            tap_hold->held = tap_hold->hold;
+        } else {
+            register_code16(tap_hold->tap);
+            tap_hold->held = tap_hold->tap;
+        }
+    }
+}
 
-//     case TX_EMAIL:
-//       if (pressed) {
-//         SEND_STRING("zeeshan.mujawar@live.com");
-//       }
-//     break;
+void tap_dance_tap_hold_reset(tap_dance_state_t *state, void *user_data) {
+    tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
 
-//     case TX_ADDR:
-//       if (pressed) {
-//         SEND_STRING("K1105, Emaar Emerald Estate, Sector 65, Gurgaon (HR) - 122018");
-//       }
-//     break;
+    if (tap_hold->held) {
+        unregister_code16(tap_hold->held);
+        tap_hold->held = 0;
+    }
+}
 
-//   }
-// }
+#define ACTION_TAP_DANCE_TAP_HOLD(tap, hold) \
+    { .fn = {NULL, tap_dance_tap_hold_finished, tap_dance_tap_hold_reset}, .user_data = (void *)&((tap_dance_tap_hold_t){tap, hold, 0}), }
+
+void td_fn_info(tap_dance_state_t *state, void *user_data) {
+    switch(state->count) {
+        case 1:
+            SEND_STRING("!ts ");
+            break;
+        case 2:
+            SEND_STRING("Dr Zeeshan Mujawar\n");
+            break;
+        case 3:
+            SEND_STRING("zeeshan.mujawar@live.com\n");
+            break;
+    }
+}
+
+void td_fn_pmhc(tap_dance_state_t *state, void *user_data) {
+    switch(state->count) {
+        case 1:
+            SEND_STRING("zee$han\n");
+            break;
+        case 2:
+            SEND_STRING("SHG1127\n");
+            SEND_STRING(SS_TAP(X_TAB) SS_DELAY(200));
+            SEND_STRING("Zee$han11\n");
+            break;
+    }
+}
+
+void td_fn_clbd(tap_dance_state_t *state, void *user_data) {
+    switch(state->count) {
+        case 1:
+            SEND_STRING(SS_LCMD(SS_TAP(X_C)));
+            break;
+        case 2:
+            SEND_STRING(SS_LCMD(SS_LSFT(SS_TAP(X_V))));
+            break;
+        case 3:
+            SEND_STRING(SS_LCMD(SS_TAP(X_SPACE)));
+            break;
+    }
+}
+
+void td_fn_encd(tap_dance_state_t *state, void *user_data) {
+    switch(state->count) {
+        case 1 ... 4:
+            indicator_encoder = state->count - 1;
+            break;
+    }
+}
+
+tap_dance_action_t tap_dance_actions[] = {
+    [TD_CAPS] = ACTION_TAP_DANCE_TAP_HOLD(M_BSPC, CW_TOGG),
+    [TD_INFO] = ACTION_TAP_DANCE_FN(td_fn_info),
+    [TD_PMHC] = ACTION_TAP_DANCE_FN(td_fn_pmhc),
+    [TD_CLBD] = ACTION_TAP_DANCE_FN(td_fn_clbd),
+    [TD_ENCD] = ACTION_TAP_DANCE_FN(td_fn_encd),
+    [TD_RALT] = ACTION_TAP_DANCE_TAP_HOLD(OSL(MAC_FN), KC_ROPT),
+};
 
 void dynamic_macro_record_start_user(void){
     indicator_dynamic_macro = 1;
-    // return true;
 }
 
 void dynamic_macro_record_end_user(int8_t direction){
     indicator_dynamic_macro = 0;
-    // return true;
 }
-
-        // case MRO_:
-        //     if (record->event.pressed) {
-        //         register_code();
-        //     } else {
-        //         unregister_code();
-        //     }
-        // break;

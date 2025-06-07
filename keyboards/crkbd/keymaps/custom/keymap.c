@@ -4,10 +4,12 @@
 #include "print.h"
 
 bool is_alt_tab_active = false;
-bool is_del_active = false;
-bool modifier_pressed = false;
+bool is_del_active     = false;
+bool is_gui_active     = false;
+bool is_cmd_c_active   = false;
 uint16_t alt_tab_timer = 0;
 uint16_t del_timer = 0;
+uint16_t cmd_c_timer = 0;
 
 enum custom_keycodes {
     M_SLCT = QK_KB_15,
@@ -119,20 +121,30 @@ void matrix_scan_user(void){
             is_del_active = false;
         }
     }
+    if (is_cmd_c_active) {
+        if (timer_elapsed(cmd_c_timer) > 1000) {
+            is_cmd_c_active = false;
+            rgb_matrix_mode_noeeprom(1);
+        }
+    }
 }
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         uint8_t layer = get_highest_layer(layer_state);
         HSV hsv = rgb_matrix_config.hsv;
 
+        if (is_cmd_c_active) {
+            return false;
+        }
+
         switch(layer) {
             case 0:
-                if(modifier_pressed) {
-                    hsv.h = 85; //Green
+                if (is_gui_active) {
+                    hsv.h = 85; // Green
                     hsv.s = 170;
                 } else {
-                    if(is_del_active){
-                        hsv.h = 0; //red
+                    if (is_del_active) {
+                        hsv.h = 0; // red
                         hsv.s = 255;
                     } else {
                         hsv.h = 0;
@@ -171,7 +183,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                 RGB rgb = hsv_to_rgb(hsv_key);
 
                 if (index >= led_min && index < led_max && index) {
-                    if(modifier_pressed){
+                    if (is_gui_active) {
                         switch(kc){
                             case KC_Q:
                                 hsv_key.h = 0;
@@ -326,6 +338,13 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record){
 
     switch (keycode) {
+        case KC_C:
+            if (record->event.pressed && (get_mods() & MOD_MASK_GUI)) {
+                rgb_matrix_set_color_all(0, 0, 255);
+                is_cmd_c_active = true;
+                cmd_c_timer = timer_read();
+            }
+            break;
         case CTL_T(M_ALTB):
             if (record->tap.count && record->event.pressed) {
                 tap_code16(M_ALTB);
@@ -455,10 +474,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record){
 
         case L_GUI:
             if (record->event.pressed) {
-                modifier_pressed = true;
+                is_gui_active = true;
                 register_code(KC_LGUI);
             } else {
-                modifier_pressed = false;
+                is_gui_active = false;
                 unregister_code(KC_LGUI);
             }
             break;

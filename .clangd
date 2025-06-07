@@ -1,4 +1,22 @@
 CompileFlags:
-  Add: [-Wno-unknown-attributes, -Wno-maybe-uninitialized, -Wno-unknown-warning-option]
-  Remove: [-W*, -mmcu=*, -mcpu=*, -mfpu=*, -mfloat-abi=*, -mno-unaligned-access, -mno-thumb-interwork, -mcall-prologues, -D__has_include*]
+  Add: [
+    -Wno-unknown-attributes,
+    -Wno-maybe-uninitialized,
+    -Wno-unknown-warning-option,
+    -DRAW_ENABLE,
+    -DLAYOUT_split_3x6_3_ex2,
+    -DENCODER_MAP_ENABLE,
+    -DRGB_MATRIX_CUSTOM_EFFECT_IMPLS,
+    -DENABLE_RGB_MATRIX_CYCLE_ALL
+  ]
+  Remove: [
+    -W*,
+    -mmcu=*,
+    -mcpu=*,
+    -mfpu=*,
+    -mfloat-abi=*,
+    -mno-unaligned-access,
+    -mno-thumb-interwork,
+    -mcall-prologues
+  ]
   Compiler: clang
